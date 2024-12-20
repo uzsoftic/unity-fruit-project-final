@@ -4,10 +4,13 @@ public class Blade : MonoBehaviour
 {
     public float sliceForce = 5f;
     public float minSliceVelocity = 0.01f;
+    public AudioClip sliceSound; // Assign the slicing sound in the Inspector
+    public AudioClip bombSound; // Assign the slicing sound in the Inspector
 
     private Camera mainCamera;
     private Collider sliceCollider;
     private TrailRenderer sliceTrail;
+    private AudioSource audioSource;
 
     public Vector3 direction { get; private set; }
     public bool slicing { get; private set; }
@@ -17,6 +20,7 @@ public class Blade : MonoBehaviour
         mainCamera = Camera.main;
         sliceCollider = GetComponent<Collider>();
         sliceTrail = GetComponentInChildren<TrailRenderer>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void OnEnable()
@@ -31,11 +35,16 @@ public class Blade : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0)) {
+        if (Input.GetMouseButtonDown(0))
+        {
             StartSlice();
-        } else if (Input.GetMouseButtonUp(0)) {
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
             StopSlice();
-        } else if (slicing) {
+        }
+        else if (slicing)
+        {
             ContinueSlice();
         }
     }
@@ -71,4 +80,31 @@ public class Blade : MonoBehaviour
         transform.position = newPosition;
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        // Check if the blade collides with a fruit
+        if (other.CompareTag("Fruit"))
+        {
+            // Play the slicing sound
+            if (audioSource != null && sliceSound != null)
+            {
+                audioSource.PlayOneShot(sliceSound);
+                //PlayOneShot(sliceSound);
+            }
+
+            // Add logic to handle fruit slicing (e.g., splitting fruit, scoring)
+            Debug.Log("Fruit sliced!");
+        }
+        else if (other.CompareTag("Bomb"))
+        {
+            // Play the slicing sound
+            if (audioSource != null && bombSound != null)
+            {
+                audioSource.PlayOneShot(bombSound);
+            }
+
+            // Add logic to handle fruit slicing (e.g., splitting fruit, scoring)
+            Debug.Log("Bomb sliced!");
+        }
+    }
 }
